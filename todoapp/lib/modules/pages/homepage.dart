@@ -15,8 +15,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String _currentQuery = '';
   int _selectedFilterIndex = 0;
   Timer? _debouncer;
+  bool _isSearching = false;
   final List<String> _filters = ['Tất cả', 'Đã hoàn thành', 'Chưa hoàn thành'];
 
   @override
@@ -54,7 +56,7 @@ class _HomePageState extends State<HomePage> {
                 } if (state.todos.isEmpty) {
                   return const Center(
                     child: Text(
-                      'Chưa có công việc nào!\nThêm một công việc mới để bắt đầu.',
+                      'Chưa có công việc nào!',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 18, color: Colors.grey),
                     ),
@@ -208,11 +210,12 @@ class _HomePageState extends State<HomePage> {
           if (_debouncer?.isActive ?? false) _debouncer!.cancel();
           _debouncer = Timer(const Duration(milliseconds: 500), () {
           if (value.trim().isEmpty) {
+            setState(() => _currentQuery = '');
             context.read<TodoListBloc>().add(const LoadTodosEvent());
             return;
           }
-          context.read<TodoListBloc>().add(SearchTodoEvent(value.trim())); 
-          _showSearchResults(context, value.trim());
+          setState(() => _currentQuery = value.trim());
+          context.read<TodoListBloc>().add(SearchTodoEvent(_currentQuery)); 
           });
         },
         decoration: InputDecoration(
@@ -227,91 +230,44 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showSearchResults(BuildContext context, String query) {
-    if (query.isEmpty) return;
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) { 
-        return AlertDialog(
-          title: const Text('Kết quả tìm kiếm'),
-          content: BlocBuilder<TodoListBloc, TodoListState>(
-            builder: (context, state) {
-              if (state.status == TodoStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state.status == TodoStatus.error) {
-                return Text('Lỗi: ${state.errorMessage}');
-              } else if (state.todos.isEmpty) {
-                return const Text('Không tìm thấy công việc nào phù hợp.');
-              }
-              return SizedBox(
-                width: double.maxFinite,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: state.todos.length,
-                  itemBuilder: (context, index) {
-                    final todo = state.todos[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: ListTile(
-                        title: Text(todo.title),
-                        onTap: () {
-                          context.push('/todos/${todo.id}');
-                        },
-                      ),
-                    );
-                  },
-                ),
+  Widget _buildFilteredChips() {
+    return BlocBuilder<TodoListBloc, TodoListState>(
+      builder: (context, state) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Wrap(
+            spacing: 8.0,
+            children: List.generate(_filters.length, (index) {
+              return ChoiceChip(
+                label: Text(_filters[index]),
+                selected: _selectedFilterIndex == index,
+                onSelected: (selected) {
+                  setState(() {
+                    _selectedFilterIndex = index;
+                  });
+                  _applyFilter(index);
+                },
               );
-            },
+            }),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Đóng'),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-          ],
         );
       },
-    );
-  }
-
-  Widget _buildFilteredChips() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(_filters.length, (index) {
-          return ChoiceChip(
-            label: Text(_filters[index]),
-            selected: _selectedFilterIndex == index,
-            onSelected: (selected) {
-              setState(() {
-                _selectedFilterIndex = index;
-              });
-              _applyFilter(index);
-            },
-          );
-        }),
-      ),
     );
   }
 
  void _applyFilter(int index) {
     switch (index) {
       case 0: // Tất cả
-        context.read<TodoListBloc>().add(const LoadTodosEvent());
+        if (_currentQuery.isEmpty)
+          {context.read<TodoListBloc>().add(const LoadTodosEvent());}
+        else
+          {context.read<TodoListBloc>().add(SearchTodoEvent(_currentQuery));}
         break;
       case 1: // Đã hoàn thành
-        context.read<TodoListBloc>().add(LoadTodosCompletedEvent());
+        context.read<TodoListBloc>().add(LoadTodosCompletedEvent(_currentQuery));
         break;
       case 2: // Chưa hoàn thành
-        context.read<TodoListBloc>().add(LoadTodosIncompleteEvent());
+        context.read<TodoListBloc>().add(LoadTodosIncompleteEvent(_currentQuery));
         break;
     }
   }

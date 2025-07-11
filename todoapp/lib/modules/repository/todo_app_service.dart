@@ -17,8 +17,8 @@ class TodoApiService {
     }
   }
 
-  Future<List<ToDo>> getTodosCompleted() async {
-    final response = await http.get(Uri.parse('$_baseUrl/todos/completed'));
+  Future<List<ToDo>> getTodosCompleted(String query) async {
+    final response = await http.get(Uri.parse('$_baseUrl/todos?q=${query}&status=completed'));
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
@@ -28,8 +28,8 @@ class TodoApiService {
     }
   }
 
-  Future<List<ToDo>> getTodosIncomplete() async {
-    final response = await http.get(Uri.parse('$_baseUrl/todos/incomplete'));
+  Future<List<ToDo>> getTodosIncomplete(String query) async {
+    final response = await http.get(Uri.parse('$_baseUrl/todos?q=${query}&status=incomplete'));
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
@@ -128,7 +128,7 @@ class TodoApiService {
   }
 
   Future<List<ToDo>> searchTodos(String query) async {
-    final response = await http.get(Uri.parse('$_baseUrl/todos/search?q=$query'));
+    final response = await http.get(Uri.parse('$_baseUrl/todos?q=$query'));
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);

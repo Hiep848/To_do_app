@@ -36,7 +36,7 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     emit(state.copyWith(status: TodoStatus.loading));
 
     try {
-      final todos = await _apiService.getTodosCompleted(); 
+      final todos = await _apiService.getTodosCompleted(event.query); 
       emit(state.copyWith(todos: todos, status: TodoStatus.success));
     } catch (e) {
       emit(state.copyWith(status: TodoStatus.error, errorMessage: e.toString()));
@@ -48,7 +48,7 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     emit(state.copyWith(status: TodoStatus.loading));
 
     try {
-      final todos = await _apiService.getTodosIncomplete(); 
+      final todos = await _apiService.getTodosIncomplete(event.query); 
       emit(state.copyWith(todos: todos, status: TodoStatus.success));
     } catch (e) {
       emit(state.copyWith(status: TodoStatus.error, errorMessage: e.toString()));
@@ -58,11 +58,17 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
   
   Future<void> _onSearchTodos(SearchTodoEvent event, Emitter<TodoListState> emit) async {
     final todos = await _apiService.searchTodos(event.query);
-    if (todos.isEmpty) {
-      emit(state.copyWith(status: TodoStatus.success, todos: []));
-    } else {
-      emit(state.copyWith(status: TodoStatus.success, todos: todos));
-    }
+
+    try{
+      if (todos.isEmpty) {
+        emit(state.copyWith(status: TodoStatus.success, todos: []));
+      } else {
+        emit(state.copyWith(status: TodoStatus.success, todos: todos));
+      }
+    } catch (e) {
+      emit(state.copyWith(status: TodoStatus.error, errorMessage: e.toString()));
+      print('Error searching todos: $e');
+    } 
   }
 
   Future<void> _onAddTodo(AddTodoEvent event, Emitter<TodoListState> emit) async {

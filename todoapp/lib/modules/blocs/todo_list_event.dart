@@ -71,17 +71,19 @@ class SearchTodoEvent extends TodoListEvent {
 }
 
 class LoadTodosCompletedEvent extends TodoListEvent {
-  const LoadTodosCompletedEvent();
+  final String query;
+  const LoadTodosCompletedEvent(this.query);
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [query];
 }
 
 class LoadTodosIncompleteEvent extends TodoListEvent {
-  const LoadTodosIncompleteEvent();
+  final String query;
+  const LoadTodosIncompleteEvent(this.query);
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [query];
 }
 
 class ReorderTodoEvent extends TodoListEvent {
