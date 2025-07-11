@@ -18,7 +18,6 @@ class _HomePageState extends State<HomePage> {
   String _currentQuery = '';
   int _selectedFilterIndex = 0;
   Timer? _debouncer;
-  bool _isSearching = false;
   final List<String> _filters = ['Tất cả', 'Đã hoàn thành', 'Chưa hoàn thành'];
 
   @override

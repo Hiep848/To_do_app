@@ -36,7 +36,8 @@ class _TodoDetailPageState extends State<TodoDetailPage> {
             onPressed: () {
               showModalBottomSheet(
                 context: context,
-                builder: (context) => _buildEditView(todo),
+                isScrollControlled: true,
+                builder: (context) => _EditTodoSheet(todo: todo),
               ).then((value) {
                 if (value != null && value is Map<String, dynamic>) {
                   final updatedTodo = todo.copyWith(
@@ -115,8 +116,9 @@ class _TodoDetailPageState extends State<TodoDetailPage> {
       ],
     );
   }
+}
 
-  Widget _buildEditView(ToDo todo) {
+Widget _buildEditView(ToDo todo) {
     TextEditingController titleController = TextEditingController(text: todo.title);
     TextEditingController descriptionController = TextEditingController(text: todo.description);
 
@@ -152,22 +154,100 @@ class _TodoDetailPageState extends State<TodoDetailPage> {
 
         Align(
           alignment: Alignment.bottomRight,
-          child: TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pop(context, {
-                'title': titleController.text,
-                'description': descriptionController.text,
-              });
-            },
-            child: const Text('Lưu'),
-          ),
         ),
 
         ],
+      ),
+    );
+  }
+
+class _EditTodoSheet extends StatefulWidget {
+  final ToDo todo;
+  const _EditTodoSheet({required this.todo});
+
+  @override
+  State<_EditTodoSheet> createState() => _EditTodoSheetState();
+}
+
+class _EditTodoSheetState extends State<_EditTodoSheet> {
+  // 1. Khai báo controllers như là thuộc tính của State
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+    // 2. Khởi tạo controllers trong initState() -> chỉ chạy 1 lần
+    _titleController = TextEditingController(text: widget.todo.title);
+    _descriptionController = TextEditingController(text: widget.todo.description);
+  }
+
+  @override
+  void dispose() {
+    // 3. Hủy controllers trong dispose() để tránh rò rỉ bộ nhớ
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 4. Bọc nội dung trong Padding và SingleChildScrollView
+    return Padding(
+      // Padding này sẽ đẩy UI lên trên khi bàn phím hiện ra
+      padding: EdgeInsets.only(
+          top: 20,
+          left: 16,
+          right: 16,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Giúp Column chỉ chiếm không gian cần thiết
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Chỉnh sửa công việc',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: 'Tiêu đề',
+                border: OutlineInputBorder(),
+              ),
+              autofocus: true, // Tự động focus vào đây
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              controller: _descriptionController,
+              maxLines: 5,
+              decoration: const InputDecoration(
+                labelText: 'Mô tả',
+                alignLabelWithHint: true,
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  // Trả về dữ liệu đã nhập
+                  Navigator.pop(context, {
+                    'title': _titleController.text,
+                    'description': _descriptionController.text,
+                  });
+                },
+                child: const Text('Lưu'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
