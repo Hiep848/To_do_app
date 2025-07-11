@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:todoapp/modules/blocs/todo_list.state.dart';
 import 'package:todoapp/modules/blocs/todo_list_bloc.dart';
 import 'package:todoapp/modules/blocs/todo_list_event.dart';
+import 'package:todoapp/modules/pages/widget/bottom_navigation_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,7 +18,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _currentQuery = '';
   int _selectedFilterIndex = 0;
-  int _selectedRouteIndex = 0;
   Timer? _debouncer;
   final List<String> _filters = ['Tất cả', 'Đã hoàn thành', 'Chưa hoàn thành'];
 
@@ -199,30 +199,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedRouteIndex, 
-        onTap: (index) {
-          setState(() {
-            _selectedRouteIndex = index;
-          });
-
-          if (index == 0) {
-            context.go('/');
-          } else if (index == 1) {
-            context.push('/statistics');
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Trang chủ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Thống kê',
-          ),
-        ],
-      ),
+      bottomNavigationBar: BottomNavigationBarCustom(),
     );
   }
 
