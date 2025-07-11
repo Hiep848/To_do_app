@@ -1,0 +1,44 @@
+[
+  {
+    "id": "6e730463-9615-43b9-94a7-52221476f6d4",
+    "title": "Thêm thanh filter",
+    "description": "- Lọc các công việc đã hoàn thành/chưa hoàn thành\n- Lọc các công việc theo ngày\n- Lọc các công việc theo tiêu đề",
+    "isCompleted": true,
+    "lastModify": "2025-07-10T18:02:18.476Z"
+  },
+  {
+    "id": "aa2e10d1-2029-477a-8da5-47ff736d54c9",
+    "title": "Thêm thanh Search",
+    "description": "- Hoạt động như 1 filter lọc công việc\n- Chỉ hiển thị theo tên (và độ giống với tên)\n- Debug hơi khoai",
+    "isCompleted": true,
+    "lastModify": "2025-07-10T18:02:45.716Z"
+  },
+  {
+    "id": "9fc25999-901c-4032-8ae5-7db131411d29",
+    "title": "Thêm tính năng edit",
+    "description": "- Sửa đổi trong trang to_do_detail\n- Thay đổi chế độ view - edit \n- Patch lên server",
+    "isCompleted": true,
+    "lastModify": "2025-07-10T02:47:08.624Z"
+  },
+  {
+    "id": "8a722829-5628-4979-a548-0ca889501cf9",
+    "title": "Thêm tính năng Drag and Drop",
+    "description": "- Kéo thả tạo ra sự thay đổi trong thứ tự của List các Todo",
+    "isCompleted": true,
+    "lastModify": "2025-07-10T04:17:36.845Z"
+  },
+  {
+    "id": "c93fe1cc-ef59-4cd4-8a1e-d755117feb11",
+    "title": "demo",
+    "description": "",
+    "isCompleted": false,
+    "lastModify": "2025-07-10T17:41:06.347Z"
+  },
+  {
+    "id": "d6cc54e7-eb17-4b8f-90d4-8ddd64e00c33",
+    "title": "nemo",
+    "description": "",
+    "isCompleted": true,
+    "lastModify": "2025-07-10T17:58:00.979Z"
+  }
+]
