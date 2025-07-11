@@ -3,8 +3,10 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid'); // Dùng uuid để tạo ID duy nhất
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors');
 const app = express();
 const port = 3000;
+app.use(cors());
 
 app.use(express.json());
 
@@ -59,35 +61,40 @@ let todos = loadTodos();
 
 // --- Định nghĩa các Endpoint API (CRUD) ---
 
-// 1. READ ALL: Lấy các công việc
+// Unified GET /todos to fetch and filter tasks
 app.get('/todos', (req, res) => {
-    console.log('GET /todos - Lấy tất cả công việc');
-    res.status(200).json(todos); // Trả về toàn bộ danh sách ToDo dưới dạng JSON
-});
+    // Get the query parameters
+    const { q, status } = req.query;
 
-app.get('/todos/search', (req, res) => {
-    const { q } = req.query;
-    if (!q || typeof q !== 'string' || q.trim() === '') {
-        return res.status(400).json({ message: 'Thiếu hoặc từ khóa tìm kiếm không hợp lệ.' });
+    // Start with the full list of tasks
+    let results = [...todos]; 
+
+    console.log(`GET /todos with parameters: q='${q}', status='${status}'`);
+
+    // 1. Filter by search keyword (if it exists)
+    if (q && q !== '*' && q !== 'all' && typeof q === 'string' && q.trim() !== '') {
+        const keyword = q.trim().toLowerCase();
+        results = results.filter(todo => 
+            todo.title.toLowerCase().includes(keyword)
+        );
+        console.log(`-> After searching for '${q}', ${results.length} tasks remain.`);
     }
-    const keyword = q.trim().toLowerCase();
-    const results = todos.filter(todo =>
-        todo.title.toLowerCase().includes(keyword)
-    );
-    console.log(`GET /todos/search?q=${q} - Kết quả tìm kiếm: ${results.length} công việc.`);
+
+    // 2. Filter by completion status (if it exists)
+    // This filter is applied to the results already filtered by the search
+    if (status) {
+        if (status === 'completed') {
+            results = results.filter(todo => todo.isCompleted === true);
+            console.log(`-> After filtering by status 'completed', ${results.length} tasks remain.`);
+        } else if (status === 'incomplete') {
+            results = results.filter(todo => todo.isCompleted === false);
+            console.log(`-> After filtering by status 'incomplete', ${results.length} tasks remain.`);
+        }
+        // If 'status' has another value, we ignore it
+    }
+
+    // Return the final result as JSON
     res.status(200).json(results);
-});
-
-app.get('/todos/completed', (req, res) => {
-    const completedTodos = todos.filter(todo => todo.isCompleted);
-    console.log('GET /todos/completed - Lấy tất cả công việc đã hoàn thành');
-    res.status(200).json(completedTodos);
-});
-
-app.get('/todos/incomplete', (req, res) => {
-    const incompleteTodos = todos.filter(todo => !todo.isCompleted);
-    console.log('GET /todos/incomplete - Lấy tất cả công việc chưa hoàn thành');
-    res.status(200).json(incompleteTodos);
 });
 
 // 2. READ ONE: Lấy một công việc theo ID
@@ -249,9 +256,9 @@ app.listen(port, () => {
     console.log(`Server API To-Do đang chạy tại http://localhost:${port}`);
     console.log('Các endpoints có sẵn:');
     console.log('GET    /todos');
-    console.log('GET    /todos/search?q=...');
-    console.log('GET    /todos/completed');
-    console.log('GET    /todos/incomplete');
+    console.log('GET    /todos?q=keyword');
+    console.log('GET    /todos?status=completed');
+    console.log('GET    /todos?status=incomplete');
     console.log('GET    /todos/search?q= "Từ khóa"');
     console.log('GET    /todos/:id');
     console.log('POST   /todos (body: { "title": "Tiêu đề", "description": "Mô tả" })');
