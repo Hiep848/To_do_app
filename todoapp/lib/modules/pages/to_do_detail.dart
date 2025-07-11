@@ -118,49 +118,6 @@ class _TodoDetailPageState extends State<TodoDetailPage> {
   }
 }
 
-Widget _buildEditView(ToDo todo) {
-    TextEditingController titleController = TextEditingController(text: todo.title);
-    TextEditingController descriptionController = TextEditingController(text: todo.description);
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-        const SizedBox(height: 8),
-        TextField(
-          controller: titleController,
-          decoration: InputDecoration(
-            labelText: 'Chỉnh sửa tiêu đề',
-            floatingLabelBehavior: FloatingLabelBehavior.always,
-            border: OutlineInputBorder(),
-          ),
-        ),
-      
-        const SizedBox(height: 24),
-      
-        TextField(
-          controller: descriptionController,
-          maxLines: 5,
-          decoration: InputDecoration(
-            labelText: 'Chỉnh sửa mô tả',
-            floatingLabelBehavior: FloatingLabelBehavior.always,
-            border: OutlineInputBorder(),
-          ),
-        ),
-
-        Spacer(),
-
-        Align(
-          alignment: Alignment.bottomRight,
-        ),
-
-        ],
-      ),
-    );
-  }
-
 class _EditTodoSheet extends StatefulWidget {
   final ToDo todo;
   const _EditTodoSheet({required this.todo});
@@ -170,21 +127,18 @@ class _EditTodoSheet extends StatefulWidget {
 }
 
 class _EditTodoSheetState extends State<_EditTodoSheet> {
-  // 1. Khai báo controllers như là thuộc tính của State
   late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
 
   @override
   void initState() {
     super.initState();
-    // 2. Khởi tạo controllers trong initState() -> chỉ chạy 1 lần
     _titleController = TextEditingController(text: widget.todo.title);
     _descriptionController = TextEditingController(text: widget.todo.description);
   }
 
   @override
   void dispose() {
-    // 3. Hủy controllers trong dispose() để tránh rò rỉ bộ nhớ
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -192,9 +146,7 @@ class _EditTodoSheetState extends State<_EditTodoSheet> {
 
   @override
   Widget build(BuildContext context) {
-    // 4. Bọc nội dung trong Padding và SingleChildScrollView
     return Padding(
-      // Padding này sẽ đẩy UI lên trên khi bàn phím hiện ra
       padding: EdgeInsets.only(
           top: 20,
           left: 16,
@@ -202,7 +154,7 @@ class _EditTodoSheetState extends State<_EditTodoSheet> {
           bottom: MediaQuery.of(context).viewInsets.bottom + 16),
       child: SingleChildScrollView(
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Giúp Column chỉ chiếm không gian cần thiết
+          mainAxisSize: MainAxisSize.min, 
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
