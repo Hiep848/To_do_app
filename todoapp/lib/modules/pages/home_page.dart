@@ -139,7 +139,7 @@ class _HomePageState extends State<HomePage> {
             FloatingActionButton(
               heroTag: null,
               onPressed: () {
-                context.read<TodoListBloc>().add(LoadTodosEvent());
+                _applyFilter(_selectedFilterIndex);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Tải lại trang thành công'),
